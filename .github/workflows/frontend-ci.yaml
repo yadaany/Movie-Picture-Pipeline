@@ -1,0 +1,41 @@
+name: parallel-job-example
+
+# Triggers for the workflow
+on:
+  # Manual trigger using the workflow_dispatch event
+  workflow_dispatch:
+      
+  # Automatic trigger on pull request events targeting the main branch
+  pull_request:
+    branches: [main]
+    paths:
+      - '/workspace/starter/frontend/**'
+
+jobs:
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: starter/frontend
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: latest
+      - run: npm ci
+      - run: npm run lint
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: latest
+      - run: npm ci
+      - run: npm test   
