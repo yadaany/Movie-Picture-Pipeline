@@ -80,6 +80,11 @@ jobs:
       - name: Update kubeconfig for EKS
         run: aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
 
+      - name: Debug Working Directory
+        run: |
+          echo "Current path: $GITHUB_WORKSPACE"
+          ls -l $GITHUB_WORKSPACE/starter/frontend/k8s
+          
       - name: Deploy to Kubernetes
         run: |
           cd starter/frontend/k8s
