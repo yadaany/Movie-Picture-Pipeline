@@ -83,7 +83,7 @@ jobs:
       - name: Debug Working Directory
         run: |
           echo "Current path: $GITHUB_WORKSPACE"
-          ls -l $GITHUB_WORKSPACE"
+          ls -l $GITHUB_WORKSPACE
 
       - name: Deploy to Kubernetes
         run: |
