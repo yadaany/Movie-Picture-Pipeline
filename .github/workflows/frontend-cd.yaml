@@ -83,10 +83,10 @@ jobs:
       - name: Debug Working Directory
         run: |
           echo "Current path: $GITHUB_WORKSPACE"
-          ls -l $GITHUB_WORKSPACE/starter/frontend/k8s
+          ls -l $GITHUB_WORKSPACE"
 
       - name: Deploy to Kubernetes
         run: |
-          cd $GITHUB_WORKSPACE
+          cd starter/frontend/k8s
           kustomize edit set image frontend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           kustomize build . | kubectl apply -f -
