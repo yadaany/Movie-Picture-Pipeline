@@ -87,5 +87,6 @@ jobs:
 
       - name: Deploy to Kubernetes
         run: |
+          cd $GITHUB_WORKSPACE
           kustomize edit set image frontend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           kustomize build . | kubectl apply -f -
