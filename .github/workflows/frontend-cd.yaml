@@ -71,9 +71,9 @@ jobs:
 
       - name: Build Docker image
         run: |
-          echo "${{ secrets.REACT_APP_MOVIE_API_URL }}"
+          echo "${{ secrets.BACKEND_API_URL }}"
           docker build \
-            --build-arg=REACT_APP_MOVIE_API_URL=${{ secrets.REACT_APP_MOVIE_API_URL }} \
+            --build-arg=REACT_APP_MOVIE_API_URL=${{ secrets.BACKEND_API_URL }} \
             -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
             
 
