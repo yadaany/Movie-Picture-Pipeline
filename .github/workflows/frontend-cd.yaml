@@ -9,8 +9,8 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  EKS_CLUSTER_NAME: my-eks-cluster
-  ECR_REPOSITORY: mp-frontend-ecr
+  EKS_CLUSTER_NAME: cluster
+  ECR_REPOSITORY: frontend
   ECR_REGISTRY: 046960828784.dkr.ecr.us-east-1.amazonaws.com
   IMAGE_TAG: ${{ github.sha }}
 
