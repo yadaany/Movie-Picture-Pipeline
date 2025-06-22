@@ -1,11 +1,18 @@
-name: Backend Continuous Integration
+name: Backend Continuous Deployment
 
 on:
   workflow_dispatch:
-  pull_request:
+  push:
     branches: [main]
     paths:
       - 'starter/frontend/**'
+
+env:
+  AWS_REGION: us-east-1
+  EKS_CLUSTER_NAME: my-eks-cluster
+  ECR_REPOSITORY: mp-backend-ecr
+  ECR_REGISTRY: 046960828784.dkr.ecr.us-east-1.amazonaws.com
+  IMAGE_TAG: ${{ github.sha }}
 
 jobs:
   lint:
@@ -59,21 +66,42 @@ jobs:
       - name: Run tests
         run: pipenv run test
 
-  build:
-    name: Build and Run Docker Image
+build-and-deploy:
+    name: Build, Push, and Deploy
     runs-on: ubuntu-latest
     needs: [lint, test]
     defaults:
       run:
         working-directory: starter/backend
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Configure AWS Credentials (with session token)
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+
       - name: Build Docker image
         run: |
-          docker build -t mp-backend:latest .
-          docker run -d -p 5000:5000 --name mp-backend mp-backend
-          sleep 5  # wait for app to start
-          curl http://localhost:5000/movies
+         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+
+      - name: Push Docker image to ECR
+        run: docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      - name: Update kubeconfig for EKS
+        run: aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
+
+      - name: Deploy to Kubernetes
+        run: |
+          echo "Current path: $GITHUB_WORKSPACE"
+          cd $GITHUB_WORKSPACE/starter/backend/k8s
+          kustomize edit set image backend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          kustomize build . | kubectl apply -f -
+
