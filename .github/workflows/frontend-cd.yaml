@@ -71,13 +71,14 @@ jobs:
 
       - name: Build Docker image
         run: |
+          echo "${{ secrets.REACT_APP_MOVIE_API_URL }}"
           docker build \
             --build-arg=REACT_APP_MOVIE_API_URL=${{ secrets.REACT_APP_MOVIE_API_URL }} \
-            -t ${{ secrets.AWS_ACCOUNT_ID }}.$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
             
 
       - name: Push Docker image to ECR
-        run: docker push ${{ secrets.AWS_ACCOUNT_ID }}.$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        run: docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
       - name: Update kubeconfig for EKS
         run: aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
@@ -86,5 +87,5 @@ jobs:
         run: |
           echo "Current path: $GITHUB_WORKSPACE"
           cd $GITHUB_WORKSPACE/starter/frontend/k8s
-          kustomize edit set image frontend=${{ secrets.AWS_ACCOUNT_ID }}.$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          kustomize edit set image frontend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           kustomize build . | kubectl apply -f -
