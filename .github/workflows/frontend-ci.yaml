@@ -71,6 +71,7 @@ jobs:
         run: npm test
 
       - name: Build Docker image
-        run: |  
-          docker build --build-arg=REACT_APP_MOVIE_API_URL=http://localhost:5000 --tag=mp-frontend:latest .
-          docker run --name mp-frontend -p 3000:3000 -d mp-frontend 
+        run: |
+          docker build \
+            --build-arg=REACT_APP_MOVIE_API_URL=${{ secrets.REACT_APP_MOVIE_API_URL }} \
+            -t mp-frontend:latest . 
