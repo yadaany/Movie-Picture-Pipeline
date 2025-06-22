@@ -71,8 +71,7 @@ jobs:
         run: npm test
 
       - name: Build Docker image
-        run: |
-          curl --fail --silent --show-error ${{ secrets.BACKEND_API_URL }}/movies
+        run: |          
           docker build \
             --build-arg=REACT_APP_MOVIE_API_URL=${{ secrets.BACKEND_API_URL }} \
             -t mp-frontend:latest . 

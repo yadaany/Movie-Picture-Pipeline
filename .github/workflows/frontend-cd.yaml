@@ -71,7 +71,6 @@ jobs:
 
       - name: Build Docker image
         run: |
-          echo "${{ secrets.BACKEND_API_URL }}"
           docker build \
             --build-arg=REACT_APP_MOVIE_API_URL=${{ secrets.BACKEND_API_URL }} \
             -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
@@ -89,3 +88,6 @@ jobs:
           cd $GITHUB_WORKSPACE/starter/frontend/k8s
           kustomize edit set image frontend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           kustomize build . | kubectl apply -f -
+
+      - name: Restart frontend deployment
+        run: kubectl rollout restart deployment/frontend    
